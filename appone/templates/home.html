@@ -1,0 +1,163 @@
+{% extends "_base.html" %}
+
+{% load static %}
+{% load custom_filters %}
+
+
+{% block head %}
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Home</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Include Leaflet CSS and JavaScript -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <!-- Include Leaflet Routing Machine CSS and JavaScript -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script> 
+
+{% endblock head %}
+
+
+{% block main %}
+    {% include "components/_create_task_popup.html" %}
+
+
+
+    <div class="flex" style="max-height: 100vh; overflow: auto;">
+        <!-- Middle Section -->
+        <div style="max-height: 100vh; height: 100vh;" class="middle-section flex flex-col">
+            <!-- Top Bar -->
+            <div class="top-bar flex justify-between">
+                <div>
+                    <h4 style="font-weight: 500; font-family: 'Poppins', sans-serif;">
+                        👋 Welcome, {{username}}
+                    </h4>
+                    <p style="font-size: small; ">You have <span class="color-brand" style="font-weight: bold;"> {{active_tasks}} </span> active tasks</p>
+                </div>
+                <div>
+                    <button onclick="showPopup()" class="btn-primary">Add a new Task</button>
+                </div>
+            </div>
+
+            <!-- Task Pool -->
+            <div class="task-pool" style="flex: 1;">
+                <h3 style="margin-bottom: 2rem;">All Tasks</h3>
+                <div class="grid-container">
+                    {% for task in tasks %}
+                    <div class="card">
+                        <h3> {{task.title}} </h3>
+                        <p style="font-size: small; font-weight: 500;"> {{task.description|truncatechars:200}} </p>
+                        <div class="bottom-bar flex" style="align-items: center;">
+                            <span> {{task.due_date|humanized_date}} </span>
+                            <span class="priority-{{task.priority}}">{{task.priority|lower}}</span>
+                            <div class="flex" style="gap: 8px; font-size: medium;">
+                                <span>
+                                    {% if task.complete %}
+                                        <i class="fa-solid fa-star" style="color: #ffb81f;"></i>
+                                    {% else %}
+                                        <i class="fa-solid fa-star" style="color: #adadad;"></i>
+                                    {% endif %}
+                                </span>
+                                <span>
+                                    <button onclick="showPopup({
+                                        id: '{{ task.id }}',
+                                        title: '{{ task.title|escapejs }}',
+                                        description: '{{ task.description|escapejs }}',
+                                        priority: '{{ task.priority }}',
+                                        due_date: '{{ task.due_date|date:"Y-m-d" }}',
+                                        complete: '{{ task.complete }}'
+                                    })" class="btn btn-edit" style="cursor: pointer;font-size: medium;"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    
+                                </span>
+                                <span>
+                                    <a href="{% url 'delete_task' task.id %}" class="btn btn-delete">
+                                        <i class="fa-solid fa-trash" style="color: #ff5100;"></i>
+                                    </a>
+                                </span>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+
+        </div>
+        <!-- Rigth-Side bar -->
+        <div id="right-side-bar">
+            <div class="status-box">
+                <div>
+                    <p>Total Tasks</p>
+                    <div style="border-left: 3px solid rgb(223, 47, 247);">
+                        <h2>{{tasks.count}}</h2>
+                    </div>
+                </div>
+                <div>
+                    <p>In Progress</p>
+                    <div style="border-left: 3px solid rgb(38, 202, 38);">
+                        <h2> {{active_tasks}} </h2>
+                    </div>
+                </div>
+                <div>
+                    <p>Open Tasks</p>
+                    <div style="border-left: 3px solid rgb(228, 145, 49);">
+                        <h2> {{active_tasks}} </h2>
+                    </div>
+                </div>
+                <div>
+                    <p>Completed</p>
+                    <div style="border-left: 3px solid rgb(38, 207, 193);">
+                        <h2>{{completed_tasks}}</h2>
+                    </div>
+                </div>
+            </div>
+            <p style="margin: 2rem 0; font-weight: 500;">Activity </p>
+            <div class="flex max-w-[30%] items-start bg-brand-dark-xl rounded-xl p-8">
+                <canvas id="myPieChart" class=""></canvas>
+    
+            </div>
+        </div>
+        
+    </div>
+    <script>
+        // Include Chart.js library in your HTML file first
+        Chart.defaults.borderColor = '#36A2EB';
+        
+        // Data for the pie chart
+        var data = {
+            labels: ['Completed', 'Active Tasks'],
+            datasets: [{
+              data: [
+                {{completed_tasks}},
+                {{active_tasks}},
+            ],
+              backgroundColor: ['#86efac', '#ef4444'],
+              borderColor: '#323437' ,
+            }]
+          };
+          
+          // Options for the pie chart
+          var options = {
+            responsive: true,
+            maintainAspectRatio: false
+          };
+          
+          // Get the context of the canvas element we want to select
+          var ctx = document.getElementById('myPieChart').getContext('2d');
+          
+          // Create the pie chart
+          var myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: data,
+            options: options
+          });
+    </script>
+{% endblock main %}

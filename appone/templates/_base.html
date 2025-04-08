@@ -1,0 +1,176 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/datepicker.min.js"></script>
+
+
+    <link href="{% static 'fontawesome/css/all.css' %}" rel="stylesheet">
+    <link href="{% static 'fontawesome/css/brands.css' %}" rel="stylesheet">
+    <link href="{% static 'fontawesome/css/solid.css' %}" rel="stylesheet">
+    
+    {% block head %}{% endblock head %}
+</head>
+
+<style>
+    @font-face {
+        font-family: 'Poppins';
+        src: url("{% static 'fonts/Poppins/Poppins-Thin.ttf' %}") format('truetype');
+        font-weight: 100;
+        font-style: normal;
+    }
+    
+    @font-face {
+        font-family: 'Poppins';
+        src: url("{% static 'fonts/Poppins/Poppins-ExtraLight.ttf' %}") format('truetype');
+        font-weight: 200;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url("{% static 'fonts/Poppins/Poppins-Light.ttf' %}") format('truetype');
+        font-weight: 300;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url("{% static 'fonts/Poppins/Poppins-Regular.ttf' %}") format('truetype');
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url("{% static 'fonts/Poppins/Poppins-Medium.ttf' %}") format('truetype');
+        font-weight: 500;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url("{% static 'fonts/Poppins/Poppins-SemiBold.ttf' %}") format('truetype');
+        font-weight: 600;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url("{% static 'fonts/Poppins/Poppins-Bold.ttf' %}") format('truetype');
+        font-weight: 700;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url("{% static 'fonts/Poppins/Poppins-ExtraBold.ttf' %}") format('truetype');
+        font-weight: 800;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url("{% static 'fonts/Poppins/Poppins-Black.ttf' %}") format('truetype');
+        font-weight: 900;
+        font-style: normal;
+    }
+
+    * {
+        font-family: 'Poppins', sans-serif;
+    }
+</style>
+
+
+<body>
+
+    <div style="width: 100%; max-height: 100vh; min-height:100vh; overflow: hidden; display: flex;">
+
+        <nav>
+            <ul class="nav-links">
+                <li><a href="/" class="nav-link color-brand"> 
+                    <i class="fa-regular fa-grid-2"></i>
+                </a></li>
+                <li><a href="/" class="nav-link"><i class="fa-regular fa-file-check"></i></a></li>
+                <li><a href="/" class="nav-link"><i class="fa-solid fa-stopwatch"></i></a></li>
+
+            </ul>
+            <div>
+                <a href="/accounts/logout/" class="nav-link" style="color: red;"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+            </div>
+        </nav>
+        <div style="flex: 1;">
+            {% block main %} {% endblock main %}
+        </div>
+    </div>
+
+    {% comment %} <ul class="messages">
+        {% if messages %}
+            {% for message in messages %}
+            <li class="message {% if message.tags == 'error' %}border-l-red-400{% elif message.tags == 'info' %}border-l-blue-400{% elif message.tags == 'success' %}border-l-green-400{% endif %}">
+                <span class="message-text">
+                {{ message }}
+                </span>
+                <button class="msg-destroy-btn"><i class="fa-solid fa-x"></i></button>
+            </li>
+            {% endfor %}
+        {% endif %}
+    </ul> {% endcomment %}
+
+</body>
+
+{% block script %}
+
+<script>
+
+    const messages = document.getElementsByClassName("message");
+
+    for (let i = 0; i < messages.length; i++) { 
+        const message = messages[i];
+
+        let cutBtn = message.querySelector('.msg-destroy-btn');
+
+        cutBtn.onclick = () => {
+            message.style.display = "none";
+        };
+    }
+
+    const messagesContainer = document.querySelector(".messages");
+    function addMessage(text, type = 'info') {
+        const message = document.createElement('li');
+        message.classList.add('message');
+
+        if (type === 'error') {
+            message.classList.add('border-l-red-400');
+        } else if (type === 'success') {
+            message.classList.add('border-l-green-400');
+        } else if (type === 'info') {
+            message.classList.add('border-l-blue-400');
+        }
+
+        const messageText = document.createElement('span');
+        messageText.classList.add('message-text');
+        messageText.textContent = text;
+
+        const cutBtn = document.createElement('button');
+        cutBtn.classList.add('msg-destroy-btn');
+        cutBtn.innerHTML = '<i class="fa-solid fa-x"></i>';
+        cutBtn.onclick = () => {
+            message.style.display = "none";
+        };
+
+        message.appendChild(messageText);
+        message.appendChild(cutBtn);
+        messagesContainer.appendChild(message);
+    }
+
+</script>
+{% endblock script %}
+
+</html>
