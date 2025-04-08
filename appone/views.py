@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Task
 
 
-# @login_required
+@login_required
 def home(request):
     if request.method == 'POST':
         task_id = request.POST.get('task_id')
